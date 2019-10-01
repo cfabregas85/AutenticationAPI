@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AutenticationAPI.Contexts;
 using AutenticationAPI.Models;
+using AutenticationAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -32,16 +33,15 @@ namespace AutenticationAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            services.AddScoped<IAccountService, AccountService>();
+
             //Register Data Encritption Services
-            services.AddDataProtection();
+            //services.AddDataProtection();
 
 
             //Register Cors. Cors allow make a request from diferents domain or Url. 
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAPIRequest",
-                    builder => builder.WithOrigins("https://www.apirequest.io/").WithMethods("GET").AllowAnyOrigin());
-            });
+            services.AddCors();
 
             //Register DbContext
             services.AddDbContext<ApplicationDbContext>(options =>
@@ -63,9 +63,8 @@ namespace AutenticationAPI
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey= true,
                     IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(Configuration["JWT:key"])),
-                    ClockSkew = TimeSpan.Zero
-                
+                    Encoding.UTF8.GetBytes(Configuration["JWT:key"])),
+                    ClockSkew = TimeSpan.Zero                
                 });                            
         }
 
@@ -83,9 +82,7 @@ namespace AutenticationAPI
 
             app.UseHttpsRedirection();
             app.UseAuthentication();
-            app.UseCors();
-            //Able to make a request from diferents domains, Also, we can filter Methods, Header, Origin, Credentials
-            //app.UseCors(builder => builder.WithOrigins("https://www.apirequest.io/").WithMethods("GET").AllowAnyOrigin());
+            app.UseCors(builder => builder.WithOrigins("http://localhost:4200").WithMethods("GET","POST").WithHeaders("*"));
             app.UseMvc();
         }
     }

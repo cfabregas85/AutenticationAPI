@@ -1,4 +1,5 @@
 ﻿using AutenticationAPI.Models;
+using AutenticationAPI.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -19,30 +20,30 @@ namespace AutenticationAPI.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly IConfiguration _configuration;
+        private readonly IAccountService _accountService;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            IConfiguration configuration)
+             IAccountService accountService)
         {
             this._userManager = userManager;
             this._signInManager = signInManager;
-            this._configuration = configuration;
+            this._accountService = accountService;
         }
 
         [HttpPost("Add")]
         public async Task<ActionResult<UserToken>> AddUser([FromBody] UserInfo model)
         {
-            var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+            var user = new ApplicationUser { UserName = model.Name, Email = model.Email };
             var result = await _userManager.CreateAsync(user, model.Password);
             if (result.Succeeded)
-            {
-                return BuildToken(model);
+            {                               
+                return this._accountService.BuildToken(model); 
             }
             else
             {
-                return BadRequest("Username or Password invalid");
+                return BadRequest(result.Errors.Select(e=>e.Description).FirstOrDefault());
             }
         }
 
@@ -52,7 +53,7 @@ namespace AutenticationAPI.Controllers
             var result = await _signInManager.PasswordSignInAsync(userInfo.Email, userInfo.Password ,isPersistent: false, lockoutOnFailure: false);
             if (result.Succeeded)            
             {
-                return BuildToken(userInfo);
+                return this._accountService.BuildToken(userInfo);
             }
             else
             {
@@ -60,39 +61,6 @@ namespace AutenticationAPI.Controllers
                 return BadRequest(ModelState);
             }
         }
-        private UserToken BuildToken(UserInfo userInfo)
-        {
-
-            //Create Claim
-            var claims = new[]
-            {
-                new Claim(JwtRegisteredClaimNames.UniqueName,userInfo.Email),
-                new Claim("Value", "MyDescripion" ),
-                //Jti: This is a unique Token Value !!!
-                new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
-             };
-
-            //Create Key
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:key"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            //Token Expiration
-            var expiration = DateTime.UtcNow.AddHours(1);
-
-            //Create JwtSecurityToken Token
-            JwtSecurityToken token = new JwtSecurityToken(
-                issuer:null,
-                audience:null,
-                claims :claims,
-                expires: expiration,
-                signingCredentials:creds
-                );
-
-            return new UserToken()
-            {
-                Token = new JwtSecurityTokenHandler().WriteToken(token),
-                Expiration = expiration            
-            };
-        }
+        
     }
 }
