@@ -14,14 +14,25 @@ namespace AutenticationAPI.Services
 {
     public class AccountService : IAccountService
     {
+
+        #region Variables
+
         private readonly IConfiguration _configuration;
         private readonly ApplicationDbContext _context;
+
+        #endregion
+
+        #region Ctor
 
         public AccountService(IConfiguration configuration, ApplicationDbContext context)
         {
             _configuration = configuration;
             _context = context;
         }
+
+        #endregion
+
+        #region Methods
 
         public UserToken BuildToken(UserInfo userInfo)
         {
@@ -40,7 +51,7 @@ namespace AutenticationAPI.Services
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             //Token Expiration
-            var expiration = DateTime.UtcNow.AddHours(1);
+            var expiration = DateTime.UtcNow.AddMinutes(1);
 
             //Create JwtSecurityToken Token
             JwtSecurityToken token = new JwtSecurityToken(
@@ -49,26 +60,24 @@ namespace AutenticationAPI.Services
                 claims: claims,
                 expires: expiration,
                 signingCredentials: creds
-                );
-
-            if (userInfo.Name == null)
-            {
-                userInfo.Name = this.GetNameByEmail(userInfo.Email);
-            }
+                );           
             
             return new UserToken()
             {
-                Email = userInfo.Email,
+                id = userInfo.id,
                 Name = userInfo.Name,
+                Email = userInfo.Email,                
                 Token = new JwtSecurityTokenHandler().WriteToken(token),
                 Expiration = expiration                
             };
         }
 
-        public string GetNameByEmail(string email) {
+        public ApplicationUser GetUserByEmail(string email) {
 
-            return _context.Users.Where(u => u.Email == email).Select(s=>s.UserName).FirstOrDefault();           
+            return _context.Users.Where(u => u.Email == email).FirstOrDefault();           
         }
+
+        #endregion
 
     }
 }
