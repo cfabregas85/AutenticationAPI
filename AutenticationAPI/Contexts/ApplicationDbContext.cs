@@ -16,5 +16,7 @@ namespace AutenticationAPI.Contexts
 
         //Entities
         public DbSet<Card> Card { get; set; }
+        public DbSet<Log> Log { get; set; }
+
     }
 }
