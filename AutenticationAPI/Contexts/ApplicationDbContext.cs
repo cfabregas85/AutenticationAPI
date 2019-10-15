@@ -12,9 +12,9 @@ namespace AutenticationAPI.Contexts
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             :base(options)
+        {}
 
-        {
-
-        }
+        //Entities
+        public DbSet<Card> Card { get; set; }
     }
 }
