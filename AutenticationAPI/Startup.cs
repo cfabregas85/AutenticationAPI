@@ -35,6 +35,8 @@ namespace AutenticationAPI
         {
 
             services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<ICardService, CardService>();
+            services.AddScoped<ILogService, LogService>();
 
             //Register Data Encritption Services
             //services.AddDataProtection();

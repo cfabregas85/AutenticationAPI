@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AutenticationAPI.Services
 {
-    public class CardService
+    public class CardService : ICardService
     {
         #region Variables
 
@@ -66,14 +66,7 @@ namespace AutenticationAPI.Services
         public async Task<bool> CardExists(int id)
         {
             return await _context.Card.AnyAsync(e => e.CardId == id);
-        }
-
-        public async Task LogMessage(string _message)
-        {
-            Log log = new Log() { message = _message };
-            _context.Log.Add(log);
-            await _context.SaveChangesAsync();
-        }
+        }        
 
         #endregion
 
