@@ -13,8 +13,8 @@ namespace AutenticationAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [EnableCors("AllowAPIRequest")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    //[EnableCors("AllowAPIRequest")]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ValuesController : ControllerBase
     {
         //Use this var to protect the test

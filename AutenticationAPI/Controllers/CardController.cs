@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutenticationAPI.Models;
 using AutenticationAPI.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,6 +13,7 @@ namespace AutenticationAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class CardController : ControllerBase
     {
 
@@ -47,7 +50,7 @@ namespace AutenticationAPI.Controllers
             }           
         }
         
-        [HttpGet("{id}")]
+        [HttpGet("{id}")]        
         public async Task<ActionResult<Card>> GetCard(int id)
         {
            try
