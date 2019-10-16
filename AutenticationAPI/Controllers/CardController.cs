@@ -53,8 +53,8 @@ namespace AutenticationAPI.Controllers
             try
             {
                 var card =  await _cardService.GetCarById(id);
-                if (card != null){ return card; }
-                return NotFound();
+                if (card == null){ return NotFound(); }
+                return card;
             }
             catch (Exception ex)
             {
