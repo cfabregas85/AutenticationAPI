@@ -50,17 +50,17 @@ namespace AutenticationAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Card>> GetCard(int id)
         {
-            try
-            {
+           try
+           {
                 var card =  await _cardService.GetCarById(id);
                 if (card == null){ return NotFound(); }
                 return card;
-            }
+           }
             catch (Exception ex)
             {
                 await _logService.LogMessage(ex.Message);
                 return StatusCode(500);
-            }           
+            }          
         }
 
         [HttpPost]
